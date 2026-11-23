@@ -1,0 +1,99 @@
+﻿// ui.rc — ресурсы: значки, версия, манифест, диалоги настроек
+#pragma code_page(65001)
+#include <windows.h>
+#include "resource.h"
+
+// Манифест: comctl32 v6 (темы), asInvoker
+1 24 "app.manifest"
+
+IDI_APP         ICON "app.ico"
+IDI_APP_PAUSED  ICON "app_paused.ico"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION    1,0,0,0
+PRODUCTVERSION 1,0,0,0
+FILEFLAGSMASK  VS_FFI_FILEFLAGSMASK
+FILEFLAGS      0
+FILEOS         VOS_NT_WINDOWS32
+FILETYPE       VFT_APP
+FILESUBTYPE    VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041904b0"
+        BEGIN
+            VALUE "FileDescription", "Lang Switcher — переключатель раскладки"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "InternalName", "LangSwitcher"
+            VALUE "LegalCopyright", "MIT License"
+            VALUE "OriginalFilename", "LangSwitcher.exe"
+            VALUE "ProductName", "Lang Switcher"
+            VALUE "ProductVersion", "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x419, 1200
+    END
+END
+
+// ---------------------------------------------------------------------------
+// Вкладка «Основные»
+// ---------------------------------------------------------------------------
+IDD_GENERAL DIALOGEX 0, 0, 230, 150
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED
+FONT 8, "MS Shell Dlg", 400, 0, 0
+BEGIN
+    CONTROL "Запускать вместе с Windows", IDC_START_WINDOWS, "Button",
+            BS_AUTOCHECKBOX | WS_TABSTOP, 12, 12, 200, 10
+    CONTROL "Запускать приостановленным", IDC_START_PAUSED, "Button",
+            BS_AUTOCHECKBOX | WS_TABSTOP, 12, 28, 200, 10
+    GROUPBOX "Как это работает", -1, 12, 46, 206, 92
+    LTEXT "Наберите слово не в той раскладке и нажмите горячую", -1, 20, 58, 190, 8
+    LTEXT "клавишу — слово перепечатается в правильной раскладке.", -1, 20, 68, 190, 8
+    LTEXT "Нажмите ещё раз — вернётся исходное: программа хранит", -1, 20, 82, 190, 8
+    LTEXT "нажатые клавиши, а не текст.", -1, 20, 92, 190, 8
+    LTEXT "Выделите текст и нажмите клавишу — выделенное сконвертируется,", -1, 20, 106, 190, 8
+    LTEXT "буфер обмена восстановится полностью.", -1, 20, 116, 190, 8
+    LTEXT "Если ничего не набрано и не выделено — клавиша просто", -1, 20, 126, 190, 8
+    LTEXT "переключает раскладку на следующую по циклу.", -1, 20, 136, 190, 8
+END
+
+// ---------------------------------------------------------------------------
+// Вкладка «Клавиша»
+// ---------------------------------------------------------------------------
+IDD_HOTKEY DIALOGEX 0, 0, 230, 150
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED
+FONT 8, "MS Shell Dlg", 400, 0, 0
+BEGIN
+    LTEXT "Горячая клавиша (кликните по полю и нажмите новую):", -1, 12, 12, 150, 8
+    EDITTEXT IDC_HOTKEY_KEY, 12, 24, 150, 14, ES_READONLY | WS_TABSTOP
+    PUSHBUTTON "Сброс", IDC_HOTKEY_RESET, 168, 24, 50, 14
+    CONTROL "Одиночное нажатие", IDC_TRIGGER_PRESS, "Button",
+            BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP, 12, 48, 120, 10
+    CONTROL "Двойное нажатие Shift", IDC_TRIGGER_DBL, "Button",
+            BS_AUTORADIOBUTTON | WS_TABSTOP, 12, 64, 120, 10
+    LTEXT "Можно использовать клавишу с Ctrl, Alt или Shift", IDC_HOTKEY_HINT, 12, 84, 206, 8
+    LTEXT "(например Ctrl+F12). Esc — отмена захвата.", -1, 12, 94, 206, 8
+    LTEXT "В полях ввода пароля программа не записывает клавиши", -1, 12, 110, 206, 8
+    LTEXT "вообще: там горячая клавиша только переключает раскладку.", -1, 12, 120, 206, 8
+END
+
+// ---------------------------------------------------------------------------
+// Вкладка «Раскладки»
+// ---------------------------------------------------------------------------
+IDD_LAYOUTS DIALOGEX 0, 0, 230, 168
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED
+FONT 8, "MS Shell Dlg", 400, 0, 0
+BEGIN
+    LTEXT "Цикл переключения (по порядку):", -1, 12, 10, 130, 8
+    LISTBOX IDC_CYCLE_LIST, 12, 22, 150, 78, LBS_NOINTEGRALHEIGHT | WS_TABSTOP
+    PUSHBUTTON "Вверх", IDC_BTN_UP, 168, 22, 50, 14
+    PUSHBUTTON "Вниз", IDC_BTN_DOWN, 168, 40, 50, 14
+    PUSHBUTTON "Удалить", IDC_BTN_REMOVE, 168, 58, 50, 14
+    LTEXT "Добавить раскладку:", -1, 12, 108, 100, 8
+    COMBOBOX IDC_AVAILABLE, 12, 120, 150, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON "Добавить", IDC_BTN_ADD, 168, 120, 50, 14
+    LTEXT "Горячая клавиша переключает на следующую раскладку цикла.",
+        IDC_LAYOUTS_HINT, 12, 146, 206, 16
+END
