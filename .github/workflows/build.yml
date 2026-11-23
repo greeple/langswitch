@@ -14,12 +14,15 @@ jobs:
         shell: msys2 {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup MSYS2 / MinGW 32-bit
         uses: msys2/setup-msys2@v2
         with:
+          # MINGW32 нужен для 32-битной XP-совместимой сборки (UCRT64 не подходит
+          # для старых Windows), поэтому предупреждение о деprecation подавляем.
           msystem: MINGW32
+          suppress-deprecation-warnings: msystem-mingw32
           update: true
           install: >-
             mingw-w64-i686-toolchain
@@ -41,19 +44,25 @@ jobs:
 
       - name: Package
         run: |
-          mkdir -p dist
-          cp build/LangSwitcher.exe dist/LangSwitcher.exe
-          cp README.md LICENSE dist/
+          # Портативная папка: EXE + короткий пользовательский README (из
+          # packaging/, без описания сборки) + иконки раскладок, если папка
+          # icons/ есть в репозитории. Сборка иконки НЕ генерирует — только
+          # копирует готовые. Лицензия в архив не кладётся.
+          mkdir -p dist/LangSwitcher
+          cp build/LangSwitcher.exe  dist/LangSwitcher/
+          cp packaging/README.md     dist/LangSwitcher/README.md
+          if compgen -G "icons/*.ico" > /dev/null 2>&1; then
+            mkdir -p dist/LangSwitcher/icons
+            cp icons/*.ico dist/LangSwitcher/icons/
+          fi
           cd dist
-          zip -9 ../LangSwitcher-win32.zip LangSwitcher.exe README.md LICENSE
+          zip -9 -r ../LangSwitcher-win32.zip LangSwitcher
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: LangSwitcher-win32
-          path: |
-            dist/LangSwitcher.exe
-            LangSwitcher-win32.zip
+          path: LangSwitcher-win32.zip
 
   release:
     name: GitHub Release
@@ -64,14 +73,12 @@ jobs:
       contents: write
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: LangSwitcher-win32
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            LangSwitcher.exe
-            LangSwitcher-win32.zip
+          files: LangSwitcher-win32.zip
           generate_release_notes: true
