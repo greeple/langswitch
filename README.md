@@ -50,8 +50,8 @@
 
 ## Значок в трее
 
-Значок показывает язык текущей раскладки активного окна. Чтобы это работало,
-положите рядом с EXE папку `icons` с иконками, названными по коду языка (LCID):
+Значок показывает язык текущей раскладки активного окна. Иконки берутся из папки
+`icons` рядом с EXE и называются по коду языка (LCID):
 
 ```
 LangSwitcher.exe
@@ -127,6 +127,11 @@ cycle=00000409,00000419   ; порядок переключения, коды KL
 
 ### Windows (MSYS2)
 
+> `pacman` — это пакетный менеджер **MSYS2** (Unix-подобной оболочки для Windows),
+> а не утилита самой Windows: в обычных `cmd`/`PowerShell` его нет. Команды ниже
+> выполняются в оболочке **MSYS2 MinGW 32-bit**, которую pacman и обслуживает.
+> Без MSYS2 локальная сборка не нужна — готовый EXE собирает GitHub Actions.
+
 ```bash
 pacman -S mingw-w64-i686-toolchain mingw-w64-i686-cmake mingw-w64-i686-ninja
 cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release
@@ -134,7 +139,8 @@ cmake --build build
 # готовый файл: build\LangSwitcher.exe
 ```
 
-Можно просто запустить `build.bat` из оболочки *MSYS2 MinGW 32-bit*.
+Тот же результат даёт `build.bat`, если запустить его из оболочки
+*MSYS2 MinGW 32-bit* (или из `cmd` с `C:\msys64\mingw32\bin` в `PATH`).
 
 ### Linux (кросс-сборка)
 
@@ -147,10 +153,12 @@ cmake --build build
 
 ### GitHub Actions
 
-Файл `.github/workflows/build.yml` собирает 32-битный EXE в
+Файл `.github/workflows/build.yml` на каждый push собирает 32-битный EXE в
 MSYS2/MINGW32, проверяет PE-заголовки (подсистема 5.01 = Windows XP) и список
-импортов, а затем прикладывает артефакт `LangSwitcher-win32` (EXE + ZIP).
-Пуш тега вида `v*` дополнительно создаёт релиз GitHub с готовыми файлами.
+импортов, а затем упаковывает портативный архив `LangSwitcher-win32.zip`:
+EXE + короткий пользовательский README (из `packaging/`) + папку `icons/`,
+если она есть в репозитории (сборка иконки не генерирует, только копирует
+готовые). Пуш тега вида `v*` дополнительно создаёт релиз GitHub с этим архивом.
 
 ---
 
@@ -169,10 +177,13 @@ src/
   log.cpp       необязательная диагностика (debug.log)
   compat.cpp    совместимость с Windows 2000/XP RTM
   ui.rc         диалоги, значки, версия, манифест
+packaging/
+  README.md     короткая пользовательская инструкция (кладётся в архив)
 tools/
-  make_icon.py  генерация встроенных иконок (нужен Pillow)
+  make_icon.py  генерация встроенных иконок программы (нужен Pillow)
 cmake/
   toolchain-mingw32.cmake   кросс-сборка под i686-w64-mingw32
+icons/          ваши иконки раскладок: 1033.ico, 1049.ico…
 ```
 
 ---
